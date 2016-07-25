@@ -30,9 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BasicGraph, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\BasicGraph.dll</HintPath>
+    <Reference Include="BasicGraph">
+      <HintPath>Libraries\BasicGraph.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,6 +50,9 @@
     <Compile Include="TurtleCommand.cs" />
     <Compile Include="TurtleStackData.cs" />
     <Compile Include="Vector2.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Libraries\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
