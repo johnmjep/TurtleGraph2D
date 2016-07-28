@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using BasicGraph;
 
@@ -50,7 +50,9 @@ namespace TurtleGraph2D
             _cmdInterpreter = new Dictionary<Commands, Action<double[]>>()
             {
                 { Commands.Forward, Forward },
+                { Commands.ForwardBlank, ForwardBlank },
                 { Commands.Backward, Backward },
+                { Commands.BackwardBlank, BackwardBlank },
                 { Commands.TurnLeft, TurnLeft },
                 { Commands.TurnRight, TurnRight },
                 { Commands.SetPosition, SetPosition },
@@ -136,6 +138,19 @@ namespace TurtleGraph2D
         }
 
         /// <summary>
+        /// Move turtle forward by specified amount and don't draw
+        /// </summary>
+        /// <param name="parameters">First index specifies distance</param>
+        public void ForwardBlank(double[] parameters)
+        {
+            double theta = Heading.ToRadians();
+            _position.X += parameters[0] * Math.Cos(theta);
+            _position.Y += parameters[0] * Math.Sin(theta);
+            _previousVertex = null;
+            _currentVertex = null;
+        }
+
+        /// <summary>
         /// Move turtle backward by specified amount
         /// </summary>
         /// <param name="parameters">First index specifies distance</param>
@@ -150,6 +165,19 @@ namespace TurtleGraph2D
                 StampPoint(null);
                 AddEdge();
             }
+        }
+
+        /// <summary>
+        /// Move turtle backward by specified amount and don't draw
+        /// </summary>
+        /// <param name="parameters">First index specifies distance</param>
+        public void BackwardBlank(double[] parameters)
+        {
+            double theta = Heading.ToRadians();
+            _position.X -= parameters[0] * Math.Cos(theta);
+            _position.Y -= parameters[0] * Math.Sin(theta);
+            _previousVertex = null;
+            _currentVertex = null;
         }
 
         /// <summary>
@@ -241,7 +269,7 @@ namespace TurtleGraph2D
             {
                 _previousVertex = _currentVertex;
                 _currentVertex = new Vertex<Vector2>(new Vector2(_position));
-                _outputGraph.AddVertex(_currentVertex);
+                _outputGraph.AddVertex(_currentVertex);                 
             }
         }
 
@@ -275,8 +303,8 @@ namespace TurtleGraph2D
             if (IsPenDown && _previousVertex != null && _currentVertex != null)
             {
                 _outputGraph.AddDirectedEdge(_previousVertex, _currentVertex);
-            }
-        }
+            }            
+        }        
         #endregion Methods
     }
 }
