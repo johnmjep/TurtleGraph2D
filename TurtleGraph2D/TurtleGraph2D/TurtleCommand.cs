@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,7 +10,9 @@ namespace TurtleGraph2D
     public enum Commands
     {
         Forward = 'F',
+        ForwardBlank = 'f',
         Backward = 'B',
+        BackwardBlank = 'b',
         TurnLeft = '-',
         TurnRight = '+',
         SetPosition = 'S',
@@ -27,7 +29,7 @@ namespace TurtleGraph2D
     /// Class to hold a Turtle Command and provide static functions for parsing raw turtle strings
     /// </summary>
     public class TurtleCommand
-    {
+    {        
         #region Instance Fields
         public Commands Cmd { get; private set; }
         public double[] Parameters { get; private set; }
@@ -38,9 +40,8 @@ namespace TurtleGraph2D
         /// Constructor
         /// </summary>
         /// <param name="cmd">Turtle Command</param>
-        public TurtleCommand(Commands cmd)
-            : this(cmd, null)
-        { }
+        public TurtleCommand(Commands cmd) 
+            : this(cmd, null) { }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -54,11 +55,13 @@ namespace TurtleGraph2D
         #endregion Constructors
 
         #region Static Fields
-        private static readonly char[] _VALID_COMMANDS = { 'F', 'B', '-', '+', 'S', 'H', '[', ']', 'U', 'D', '@' };
+        private static readonly char[] _VALID_COMMANDS = { 'F', 'f', 'B', 'b', '-', '+', 'S', 'H', '[', ']', 'U', 'D', '@' };
         private static readonly Dictionary<char, Commands> _COMMAND_TABLE = new Dictionary<char, Commands>()
         {
             { (char)Commands.Backward, Commands.Backward },
+            { (char)Commands.BackwardBlank, Commands.BackwardBlank },
             { (char)Commands.Forward, Commands.Forward },
+            { (char)Commands.ForwardBlank, Commands.ForwardBlank },
             { (char)Commands.TurnLeft, Commands.TurnLeft },
             { (char)Commands.TurnRight, Commands.TurnRight },
             { (char)Commands.SetPosition, Commands.SetPosition },
@@ -95,7 +98,7 @@ namespace TurtleGraph2D
                 if (CommandHasParameters(thisCmd))
                 {
                     tCmd = new TurtleCommand(GetCommandFromRaw(thisCmd), GetParametersFromRaw(thisCmd));
-                }
+                }                
                 else
                 {
                     tCmd = new TurtleCommand(GetCommandFromRaw(thisCmd));
@@ -106,7 +109,7 @@ namespace TurtleGraph2D
                 tCmd = new TurtleCommand(Commands.Invalid);
             }
             return tCmd;
-        }
+        }        
 
         /// <summary>
         /// Determines if a string contais a valid turtle command
@@ -147,10 +150,20 @@ namespace TurtleGraph2D
         /// <returns>Index of next command from starting point</returns>
         private static int FindIndexOfNextCommand(string rawCommandString, int startIndex)
         {
+            bool withinBrackets = false;
             int index = ITEM_NOT_FOUND;
             for (int i = startIndex; i < rawCommandString.Length; i++)
             {
-                if (_VALID_COMMANDS.Contains(rawCommandString[i]))
+                // Ignore any commands within brakets (otherwise negative parameters cause problems)
+                if (!withinBrackets && rawCommandString[i] == _PARAMETER_START_DELIMITER)
+                {
+                    withinBrackets = true;
+                }
+                else if (withinBrackets && rawCommandString[i] == _PARAMETER_END_DELIMITER)
+                {
+                    withinBrackets = false;
+                }
+                if(_VALID_COMMANDS.Contains(rawCommandString[i]) && !withinBrackets)
                 {
                     index = i;
                     break;
@@ -168,9 +181,14 @@ namespace TurtleGraph2D
         /// </summary>
         /// <param name="rawCommand">Input string</param>
         /// <returns>Enumerated Command</returns>
-        private static Commands GetCommandFromRaw(string rawCommand)
+        public static Commands GetCommandFromRaw(string rawCommand)
         {
-            return _COMMAND_TABLE[rawCommand[_START_INDEX]];
+            Commands cmd = Commands.Invalid;
+            if (_VALID_COMMANDS.Contains(rawCommand[0]))
+            {
+                cmd = _COMMAND_TABLE[rawCommand[_START_INDEX]]; 
+            }
+            return cmd;
         }
 
         /// <summary>
