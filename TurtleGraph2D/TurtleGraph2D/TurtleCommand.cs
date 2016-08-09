@@ -184,7 +184,7 @@ namespace TurtleGraph2D
         public static Commands GetCommandFromRaw(string rawCommand)
         {
             Commands cmd = Commands.Invalid;
-            if (_VALID_COMMANDS.Contains(rawCommand[0]))
+            if (rawCommand.Length > 0 && _VALID_COMMANDS.Contains(rawCommand[0]))
             {
                 cmd = _COMMAND_TABLE[rawCommand[_START_INDEX]]; 
             }
@@ -203,25 +203,53 @@ namespace TurtleGraph2D
             string rawParameters = rawCommand.Substring(rawCommand.IndexOf(_PARAMETER_START_DELIMITER), parameterLength);
             string trimmedParameters = rawParameters.Replace(_PARAMETER_START_DELIMITER.ToString(), "")
                                                     .Replace(_PARAMETER_END_DELIMITER.ToString(), "");
-            try
+
+            if (!HasNonDoubleParameters(trimmedParameters))
             {
-                parameters = Array.ConvertAll(trimmedParameters.Split(_PARAMETER_DELIMITER), double.Parse);
+                try
+                {
+                    parameters = Array.ConvertAll(trimmedParameters.Split(_PARAMETER_DELIMITER), double.Parse);
+                }
+                catch (FormatException exc)
+                {
+                    Console.WriteLine("XXX Encountered Format Exception parsing command parameters");
+                    Console.WriteLine("XXX String: {0}", rawCommand);
+                    Console.WriteLine("XXX Message: {0}", exc.Message);
+                    Console.WriteLine("XXX Source: {0}", exc.Source);
+                    Console.WriteLine("XXX Stack: {0}", exc.StackTrace);
+                    parameters = null;
+                }
+                catch (Exception exc)
+                {
+                    throw exc;
+                } 
             }
-            catch (FormatException exc)
+            else
             {
-                Console.WriteLine("XXX Encountered Format Exception parsing command parameters");
-                Console.WriteLine("XXX String: {0}", rawCommand);
-                Console.WriteLine("XXX Message: {0}", exc.Message);
-                Console.WriteLine("XXX Source: {0}", exc.Source);
-                Console.WriteLine("XXX Stack: {0}", exc.StackTrace);
                 parameters = null;
             }
-            catch (Exception exc)
-            {
-                throw exc;
-            }
             return parameters;
+        }
+
+        /// <summary>
+        /// Determines if a parameter set contains any non-Double parameters
+        /// </summary>
+        /// <param name="parameters">Comma delimited parameter set</param>
+        /// <returns>True if contains non-Double</returns>
+        private static bool HasNonDoubleParameters(string parameters)
+        {
+            bool nonDouble = false;
+            double dOut;
+            foreach (string s in parameters.Split(_PARAMETER_DELIMITER))
+            {
+                if (double.TryParse(s, out dOut) == false)
+                {
+                    nonDouble = true;
+                }
+            }
+            return nonDouble;
         }
         #endregion Static Methods
     }
 }
+
