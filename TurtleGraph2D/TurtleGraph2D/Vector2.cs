@@ -1,4 +1,6 @@
-﻿namespace TurtleGraph2D
+using System;
+
+namespace TurtleGraph2D
 {
     /// <summary>
     /// Simple structure to hold a 2D vector
@@ -15,8 +17,8 @@
         /// Constructor
         /// </summary>
         /// <param name="v">Vector to copy</param>
-        public Vector2(Vector2 v)
-            : this(v.X, v.Y)
+        public Vector2(Vector2 v) 
+            : this(v.X, v.Y) 
         { }
         /// <summary>
         /// Constructor
@@ -49,6 +51,16 @@
         {
             X = x;
             Y = y;
+        }
+
+        /// <summary>
+        /// Returns the distance from this Vector to another Vector2
+        /// </summary>
+        /// <param name="x">Vector to measure to</param>
+        /// <returns>Distance as double</returns>
+        public double Distance(Vector2 v)
+        {
+            return Math.Sqrt(Math.Pow((v.X - this.X), 2) + Math.Pow((v.Y - this.Y), 2));
         }
 
         /// <summary>
